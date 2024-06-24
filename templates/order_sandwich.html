@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Sandwich</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #2c2c2c;
+            color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-container, .output-container {
+            width: 48%;
+        }
+        h1 {
+            text-align: center;
+            color: #ffa500;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        label {
+            width: 150px;
+            color: #ccc;
+        }
+        input[type="text"], select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #444;
+            color: #f1f1f1;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .checkbox-group label {
+            margin-bottom: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color: #ffa500;
+            color: #333;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            align-self: center;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #ff8c00;
+        }
+        .confirmation {
+            background-color: #444;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .confirmation h2 {
+            color: #ffa500;
+        }
+        .confirmation p {
+            color: #f1f1f1;
+        }
+        .success-message {
+            color: #28a745;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .error {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>Order Your Sandwich</h1>
+            <form id="sandwich-form" enctype="multipart/form-data">
+                <div id="sandwiches-container">
+                    <div class="sandwich-fields">
+                        <input type="hidden" name="item_type[]" value="sandwich">
+                        <div class="form-group">
+                            <label for="name">Sandwich Type:</label>
+                            <input type="text" name="name[]" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="size">Size:</label>
+                            <select name="size[]" required>
+                                <option value="Small">Small</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Large">Large</option>
+                            </select>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <label for="toppings">Toppings:</label>
+                            <label><input type="checkbox" name="toppings_0[]" value="Extra Cheese"> Extra Cheese</label>
+                            <label><input type="checkbox" name="toppings_0[]" value="Lettuce"> Lettuce</label>
+                            <label><input type="checkbox" name="toppings_0[]" value="Tomato"> Tomato</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Address:</label>
+                            <input type="text" name="address[]" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone:</label>
+                            <input type="text" name="phone[]" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="image">Image:</label>
+                            <input type="file" name="image_0" accept="image/*" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" onclick="addSandwichFields()">Add Another Sandwich</button>
+                <button type="button" onclick="submitForm()">Order Now</button>
+                <input type="hidden" id="item-count" name="item_count" value="1">
+            </form>
+            <div id="error" class="error"></div>
+        </div>
+
+        <div class="output-container" id="output-container">
+        </div>
+    </div>
+
+    <script>
+        let sandwichCount = 1;
+
+        function addSandwichFields() {
+            const container = document.getElementById('sandwiches-container');
+
+            const newSandwichFields = document.createElement('div');
+            newSandwichFields.classList.add('sandwich-fields');
+
+            newSandwichFields.innerHTML = `
+                <input type="hidden" name="item_type[]" value="sandwich">
+                <div class="form-group">
+                    <label for="name">Sandwich Type:</label>
+                    <input type="text" name="name[]" required>
+                </div>
+                <div class="form-group">
+                    <label for="size">Size:</label>
+                    <select name="size[]" required>
+                        <option value="Small">Small</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Large">Large</option>
+                    </select>
+                </div>
+                <div class="checkbox-group">
+                    <label for="toppings">Toppings:</label>
+                    <label><input type="checkbox" name="toppings_${sandwichCount}[]" value="Extra Cheese"> Extra Cheese</label>
+                    <label><input type="checkbox" name="toppings_${sandwichCount}[]" value="Lettuce"> Lettuce</label>
+                    <label><input type="checkbox" name="toppings_${sandwichCount}[]" value="Tomato"> Tomato</label>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <input type="text" name="address[]" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="text" name="phone[]" required>
+                </div>
+                <div class="form-group">
+                    <label for="image">Image:</label>
+                    <input type="file" name="image_${sandwichCount}" accept="image/*" required>
+                </div>
+            `;
+
+            container.appendChild(newSandwichFields);
+
+            sandwichCount++;
+            document.getElementById('item-count').value = sandwichCount;
+        }
+
+        function submitForm() {
+            const form = document.getElementById('sandwich-form');
+            const formData = new FormData(form);
+
+            fetch('/order', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => displayResponse(data))
+            .catch(error => {
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = 'An error occurred: ' + error.message;
+            });
+        }
+
+        function displayResponse(data) {
+            const outputContainer = document.getElementById('output-container');
+            outputContainer.innerHTML = '';
+
+            if (data.orders) {
+                data.orders.forEach(order => {
+                    const orderDiv = document.createElement('div');
+                    orderDiv.classList.add('confirmation');
+                    orderDiv.innerHTML = `
+                        <h2>Order Confirmation</h2>
+                        <p><strong>Sandwich Type:</strong> ${order.name}</p>
+                        <p><strong>Size:</strong> ${order.size}</p>
+                        <p><strong>Toppings:</strong> ${order.toppings.join(', ')}</p>
+                        <p><strong>Address:</strong> ${order.address}</p>
+                        <p><strong>Phone:</strong> ${order.phone}</p>
+                        <p><strong>Image:</strong></p>
+                        <img src="/uploads/${order.image_filename}" alt="Uploaded Image" style="width: 300px; height: 300px;">
+                        <p class="success-message">${data.message}</p>
+                    `;
+                    outputContainer.appendChild(orderDiv);
+                });
+            } else if (data.error) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = data.error;
+                outputContainer.appendChild(errorDiv);
+            }
+        }
+    </script>
+</body>
+</html>
